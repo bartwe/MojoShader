@@ -950,12 +950,20 @@ MOJOSHADER_effect *MOJOSHADER_compileEffect(const unsigned char *buf,
     retval->ctx.m = m;
     retval->ctx.f = f;
 
+    const uint8 *base = NULL;
+    uint32 header = 0;
+    uint32 numparams;
+    uint32 numtechniques;
+    uint32 numobjects;
+      uint32 siz ;
+    int numsmallobjects;
+    int numlargeobjects;
+
     if (len < 8)
         goto parseEffect_unexpectedEOF;
 
     /* Read in header magic, seek to initial offset */
-    const uint8 *base = NULL;
-    uint32 header = readui32(&ptr, &len);
+    header = readui32(&ptr, &len);
     if (header == 0xBCF00BCF)
     {
         /* The Effect compiler provided with XNA4 adds some extra mess at the
@@ -986,14 +994,14 @@ MOJOSHADER_effect *MOJOSHADER_compileEffect(const unsigned char *buf,
         goto parseEffect_unexpectedEOF;
 
     /* Parse structure counts */
-    const uint32 numparams = readui32(&ptr, &len);
-    const uint32 numtechniques = readui32(&ptr, &len);
+    numparams = readui32(&ptr, &len);
+    numtechniques = readui32(&ptr, &len);
     /*const uint32 FIXME =*/ readui32(&ptr, &len);
-    const uint32 numobjects = readui32(&ptr, &len);
+    numobjects = readui32(&ptr, &len);
 
     /* Alloc structures now, so object types can be stored */
     retval->object_count = numobjects;
-    const uint32 siz = sizeof (MOJOSHADER_effectObject) * numobjects;
+    siz = sizeof (MOJOSHADER_effectObject) * numobjects;
     retval->objects = (MOJOSHADER_effectObject *) m(siz, d);
     if (retval->objects == NULL)
         goto parseEffect_outOfMemory;
@@ -1019,8 +1027,8 @@ MOJOSHADER_effect *MOJOSHADER_compileEffect(const unsigned char *buf,
         goto parseEffect_unexpectedEOF;
 
     /* Parse object counts */
-    const int numsmallobjects = readui32(&ptr, &len);
-    const int numlargeobjects = readui32(&ptr, &len);
+    numsmallobjects = readui32(&ptr, &len);
+    numlargeobjects = readui32(&ptr, &len);
 
     errors = errorlist_create(m, f, d);
     if (errors == NULL)

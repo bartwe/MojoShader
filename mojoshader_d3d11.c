@@ -726,6 +726,8 @@ MOJOSHADER_d3d11Shader *MOJOSHADER_d3d11CompileShader(MOJOSHADER_d3d11Context *c
                                                      bufsize, swiz, swizcount,
                                                      smap, smapcount, m, f, d);
 
+      MOJOSHADER_d3d11Shader *retval  = NULL;
+
     if (pd->error_count > 0)
     {
         // !!! FIXME: put multiple errors in the buffer? Don't use
@@ -734,7 +736,7 @@ MOJOSHADER_d3d11Shader *MOJOSHADER_d3d11CompileShader(MOJOSHADER_d3d11Context *c
         goto compile_shader_fail;
     } // if
 
-    MOJOSHADER_d3d11Shader *retval = (MOJOSHADER_d3d11Shader *) m(sizeof(MOJOSHADER_d3d11Shader), d);
+    retval = (MOJOSHADER_d3d11Shader *) m(sizeof(MOJOSHADER_d3d11Shader), d);
     if (retval == NULL)
         goto compile_shader_fail;
 

@@ -852,19 +852,19 @@ bool SDL_ShaderCross_Init(void)
         if (dxil_dll == NULL) {
             SDL_LogError(SDL_LOG_CATEGORY_GPU, "Failed to load DXIL library, this will cause pipeline creation failures!");
 
-            SDL_UnloadObject(dxcompiler_dll);
+            SDL_UnloadObject((SDL_SharedObject *)dxcompiler_dll);
             dxcompiler_dll = NULL;
         } else {
-            SDL_UnloadObject(dxil_dll); /* Unload immediately, we don't actually need it */
+            SDL_UnloadObject((SDL_SharedObject *)dxil_dll); /* Unload immediately, we don't actually need it */
         }
 #endif
     }
 
     if (dxcompiler_dll != NULL) {
-        SDL_DxcCreateInstance = (DxcCreateInstanceProc)SDL_LoadFunction(dxcompiler_dll, "DxcCreateInstance");
+        SDL_DxcCreateInstance = (DxcCreateInstanceProc)SDL_LoadFunction((SDL_SharedObject *)dxcompiler_dll, "DxcCreateInstance");
 
         if (SDL_DxcCreateInstance == NULL) {
-            SDL_UnloadObject(dxcompiler_dll);
+            SDL_UnloadObject((SDL_SharedObject *)dxcompiler_dll);
             dxcompiler_dll = NULL;
         }
     }
@@ -872,10 +872,10 @@ bool SDL_ShaderCross_Init(void)
     d3dcompiler_dll = SDL_LoadObject(D3DCOMPILER_DLL);
 
     if (d3dcompiler_dll != NULL) {
-        SDL_D3DCompile = (pfn_D3DCompile)SDL_LoadFunction(d3dcompiler_dll, "D3DCompile");
+        SDL_D3DCompile = (pfn_D3DCompile)SDL_LoadFunction((SDL_SharedObject *)d3dcompiler_dll, "D3DCompile");
 
         if (SDL_D3DCompile == NULL) {
-            SDL_UnloadObject(d3dcompiler_dll);
+            SDL_UnloadObject((SDL_SharedObject *)d3dcompiler_dll);
             d3dcompiler_dll = NULL;
         }
     }
@@ -891,7 +891,7 @@ bool SDL_ShaderCross_Init(void)
     if (spvc_loaded) {
 #define CHECK_FUNC(func)                                                  \
     if (SDL_##func == NULL) {                                             \
-        SDL_##func = (pfn_##func)SDL_LoadFunction(spirvcross_dll, #func); \
+        SDL_##func = (pfn_##func)SDL_LoadFunction((SDL_SharedObject *)spirvcross_dll, #func); \
         if (SDL_##func == NULL) {                                         \
             spvc_loaded = false;                                      \
         }                                                                 \
@@ -911,7 +911,7 @@ bool SDL_ShaderCross_Init(void)
     }
 
     if (spirvcross_dll != NULL && !spvc_loaded) {
-        SDL_UnloadObject(spirvcross_dll);
+        SDL_UnloadObject((SDL_SharedObject *)spirvcross_dll);
         spirvcross_dll = NULL;
     }
 #endif /* SDL_GPU_SHADERCROSS_STATIC */
@@ -944,14 +944,14 @@ void SDL_ShaderCross_Quit(void)
 
 #if SDL_GPU_SHADERCROSS_HLSL
     if (d3dcompiler_dll != NULL) {
-        SDL_UnloadObject(d3dcompiler_dll);
+        SDL_UnloadObject((SDL_SharedObject *)d3dcompiler_dll);
         d3dcompiler_dll = NULL;
 
         SDL_D3DCompile = NULL;
     }
 
     if (dxcompiler_dll != NULL) {
-        SDL_UnloadObject(dxcompiler_dll);
+        SDL_UnloadObject((SDL_SharedObject *)dxcompiler_dll);
         dxcompiler_dll = NULL;
 
         SDL_DxcCreateInstance = NULL;

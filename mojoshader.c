@@ -2318,6 +2318,8 @@ static void parse_constant_table(Context *ctx, const uint32 *tokens,
     const uint32 constants = SWAP32(tokens[5]);
     const uint32 constantinfo = SWAP32(tokens[6]);
     const uint32 target = SWAP32(tokens[8]);
+        uint32 i = 0;
+
 
     if (size != CTAB_SIZE)
         goto corrupt_ctab;
@@ -2342,7 +2344,6 @@ static void parse_constant_table(Context *ctx, const uint32 *tokens,
     } // if
     ctab->symbol_count = constants;
 
-    uint32 i = 0;
     for (i = 0; i < constants; i++)
     {
         const uint8 *ptr = start + constantinfo + (i * CINFO_SIZE);

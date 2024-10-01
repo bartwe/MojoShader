@@ -174,7 +174,7 @@ static uint8_t update_uniform_buffer(
     if (shader->uniformBufferSize > ctx->uniform_staging_length)
     {
         ctx->free_fn(ctx->uniform_staging, ctx->malloc_data);
-        ctx->uniform_staging = ctx->malloc_fn(shader->uniformBufferSize, ctx->malloc_data);
+        ctx->uniform_staging = (uint8*)ctx->malloc_fn(shader->uniformBufferSize, ctx->malloc_data);
         ctx->uniform_staging_length = shader->uniformBufferSize;
     } // if
 
@@ -456,7 +456,7 @@ MOJOSHADER_sdlProgram *MOJOSHADER_sdlLinkProgram(
     createInfo.num_samplers = vshader->samplerSlots;
     createInfo.num_uniform_buffers = 1;
 
-    program->vertexShader = SDL_ShaderCross_CompileFromSPIRV(
+    program->vertexShader = (SDL_GPUShader *)SDL_ShaderCross_CompileFromSPIRV(
         ctx->device,
         &createInfo,
         false
@@ -476,7 +476,7 @@ MOJOSHADER_sdlProgram *MOJOSHADER_sdlLinkProgram(
     createInfo.stage = SDL_GPU_SHADERSTAGE_FRAGMENT;
     createInfo.num_samplers = pshader->samplerSlots;
 
-    program->pixelShader = SDL_ShaderCross_CompileFromSPIRV(
+    program->pixelShader = (SDL_GPUShader *)SDL_ShaderCross_CompileFromSPIRV(
         ctx->device,
         &createInfo,
         false
