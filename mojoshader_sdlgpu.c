@@ -201,7 +201,7 @@ static uint8_t update_uniform_buffer(
     if (shader->uniformBufferSize > ctx->uniform_staging_length)
     {
         ctx->free_fn(ctx->uniform_staging, ctx->malloc_data);
-        ctx->uniform_staging = ctx->malloc_fn(shader->uniformBufferSize, ctx->malloc_data);
+        ctx->uniform_staging = (uint8_t*)ctx->malloc_fn(shader->uniformBufferSize, ctx->malloc_data);
         ctx->uniform_staging_length = shader->uniformBufferSize;
     } // if
 
@@ -652,19 +652,19 @@ static MOJOSHADER_sdlProgram *compile_program(
         // Handle texcoord0 -> point_coord conversion
         if (strstr(vshaderSource, "[[point_size]]"))
         {
-            pshaderSource = (char *) ctx->malloc_fn(strlen(pshader->parseData->output) + 1, ctx->malloc_data);
-            if (!pshaderSource)
+            char *sourceCopy = (char *) ctx->malloc_fn(strlen(pshader->parseData->output) + (size_t)1, ctx->malloc_data);
+            if (!sourceCopy)
             {
                 out_of_memory();
                 return NULL;
             }
-            strcpy(pshaderSource, pshader->parseData->output);
+            strcpy(sourceCopy, pshader->parseData->output);
 
             // !!! FIXME: This assumes all texcoord0 attributes in the effect are
             // !!! FIXME:  actually point coords! It ain't necessarily so! -caleb
             const char *repl = "[[  point_coord  ]]";
             char *ptr;
-            while ((ptr = strstr(pshaderSource, "[[user(texcoord0)]]")))
+            while ((ptr = strstr(sourceCopy, "[[user(texcoord0)]]")))
             {
                 memcpy(ptr, repl, strlen(repl));
 
@@ -675,6 +675,7 @@ static MOJOSHADER_sdlProgram *compile_program(
                         spaces++;
                 *ptr = '2';
             } // while
+            pshaderSource = sourceCopy;
         } // if
     }
 
@@ -720,7 +721,7 @@ static MOJOSHADER_sdlProgram *compile_program(
     } // if
 
     if (pshaderSource != pshader->parseData->output)
-        ctx->free_fn(pshaderSource, ctx->malloc_data);
+        ctx->free_fn((char*)pshaderSource, ctx->malloc_data);
 
     return program;
 } // compile_program

@@ -972,14 +972,23 @@ MOJOSHADER_effect *MOJOSHADER_compileEffect(const unsigned char *buf,
     retval->ctx.m = m;
     retval->ctx.f = f;
 
-    if (len < 8)
-        goto parseEffect_unexpectedEOF;
 
     /* Read in header magic, seek to initial offset */
     const uint8 *base = NULL;
-    uint16 magic;
-    uint8 version_major;
-    uint8 version_minor;
+    uint16 magic = 0;
+    uint8 version_major = 0;
+    uint8 version_minor = 0;
+    uint32 numparams = 0;
+    uint32 numtechniques = 0;
+    uint32 numobjects = 0;
+    uint32 siz = 0;
+    int numsmallobjects = 0;
+    int numlargeobjects = 0;
+
+    if (len < 8)
+        goto parseEffect_unexpectedEOF;
+
+
     read_version_token(&ptr, &len, &magic, &version_major, &version_minor);
     if ((magic == 0xBCF0) && (version_major == 0x0B) && (version_minor == 0xCF))
     {
@@ -1011,14 +1020,14 @@ MOJOSHADER_effect *MOJOSHADER_compileEffect(const unsigned char *buf,
         goto parseEffect_unexpectedEOF;
 
     /* Parse structure counts */
-    const uint32 numparams = readui32(&ptr, &len);
-    const uint32 numtechniques = readui32(&ptr, &len);
+    numparams = readui32(&ptr, &len);
+    numtechniques = readui32(&ptr, &len);
     /*const uint32 FIXME =*/ readui32(&ptr, &len);
-    const uint32 numobjects = readui32(&ptr, &len);
+    numobjects = readui32(&ptr, &len);
 
     /* Alloc structures now, so object types can be stored */
     retval->object_count = numobjects;
-    const uint32 siz = sizeof (MOJOSHADER_effectObject) * numobjects;
+    siz = sizeof (MOJOSHADER_effectObject) * numobjects;
     retval->objects = (MOJOSHADER_effectObject *) m(siz, d);
     if (retval->objects == NULL)
         goto parseEffect_outOfMemory;
@@ -1044,8 +1053,8 @@ MOJOSHADER_effect *MOJOSHADER_compileEffect(const unsigned char *buf,
         goto parseEffect_unexpectedEOF;
 
     /* Parse object counts */
-    const int numsmallobjects = readui32(&ptr, &len);
-    const int numlargeobjects = readui32(&ptr, &len);
+    numsmallobjects = readui32(&ptr, &len);
+    numlargeobjects = readui32(&ptr, &len);
 
     errors = errorlist_create(m, f, d);
     if (errors == NULL)

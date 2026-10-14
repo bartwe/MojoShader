@@ -721,6 +721,7 @@ MOJOSHADER_d3d11Shader *MOJOSHADER_d3d11CompileShader(MOJOSHADER_d3d11Context *c
     MOJOSHADER_free f = ctx->free_fn;
     void *d = ctx->malloc_data;
     int i;
+    MOJOSHADER_d3d11Shader *retval = nullptr;
 
     const MOJOSHADER_parseData *pd = MOJOSHADER_parse("hlsl", mainfn, tokenbuf,
                                                      bufsize, swiz, swizcount,
@@ -734,7 +735,7 @@ MOJOSHADER_d3d11Shader *MOJOSHADER_d3d11CompileShader(MOJOSHADER_d3d11Context *c
         goto compile_shader_fail;
     } // if
 
-    MOJOSHADER_d3d11Shader *retval = (MOJOSHADER_d3d11Shader *) m(sizeof(MOJOSHADER_d3d11Shader), d);
+    retval = (MOJOSHADER_d3d11Shader *) m(sizeof(MOJOSHADER_d3d11Shader), d);
     if (retval == NULL)
         goto compile_shader_fail;
 
